@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/utils/responsive.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -76,9 +76,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     final r = Responsive(context);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: kBg,
+      backgroundColor: cs.bg,
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnim,
@@ -98,7 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       vertical: r.xs,
                     ),
                     decoration: BoxDecoration(
-                      border: Border.all(color: kBorder2, width: 0.5),
+                      border: Border.all(color: cs.border2, width: 0.5),
                       borderRadius: BorderRadius.circular(100),
                     ),
                     child: Row(
@@ -107,8 +108,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         Container(
                           width: 6,
                           height: 6,
-                          decoration: const BoxDecoration(
-                            color: kLime,
+                          decoration: BoxDecoration(
+                            color: cs.lime,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -117,7 +118,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           'FIT FUSION',
                           style: GoogleFonts.rajdhani(
                             fontSize: r.sp(11),
-                            color: kTextSec,
+                            color: cs.textSec,
                             letterSpacing: 2,
                             fontWeight: FontWeight.w500,
                           ),
@@ -134,7 +135,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     style: GoogleFonts.rajdhani(
                       fontSize: r.sp(64),
                       fontWeight: FontWeight.w700,
-                      color: kTextPri,
+                      color: cs.textPri,
                       height: 0.9,
                       letterSpacing: -1,
                     ),
@@ -143,7 +144,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   SizedBox(height: r.lg),
 
                   // Accent line
-                  Container(width: r.w(15), height: 2, color: kLime),
+                  Container(width: r.w(15), height: 2, color: cs.lime),
 
                   SizedBox(height: r.lg),
 
@@ -152,7 +153,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     'Track your exercises, shuffle\nyour routine, and push further\nevery session.',
                     style: GoogleFonts.dmSans(
                       fontSize: r.sp(16),
-                      color: kTextSec,
+                      color: cs.textSec,
                       height: 1.6,
                       fontWeight: FontWeight.w400,
                     ),
@@ -165,14 +166,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     spacing: r.sm,
                     runSpacing: r.sm,
                     children: [
-                      _featurePill(r, Icons.shuffle_rounded, 'Smart Shuffle'),
                       _featurePill(
                         r,
+                        cs,
+                        Icons.shuffle_rounded,
+                        'Smart Shuffle',
+                      ),
+                      _featurePill(
+                        r,
+                        cs,
                         Icons.fitness_center_rounded,
                         'Weight Tracking',
                       ),
                       _featurePill(
                         r,
+                        cs,
                         Icons.check_circle_outline_rounded,
                         'Session Progress',
                       ),
@@ -191,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         width: double.infinity,
                         height: r.h(8).clamp(56.0, 72.0),
                         decoration: BoxDecoration(
-                          color: _loading ? kBorder2 : kLime,
+                          color: _loading ? cs.border2 : cs.lime,
                           borderRadius: BorderRadius.circular(100),
                         ),
                         child: Center(
@@ -201,7 +209,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: kTextMuted,
+                                    color: cs.textMuted,
                                   ),
                                 )
                               : Row(
@@ -212,14 +220,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       style: GoogleFonts.rajdhani(
                                         fontSize: r.sp(17),
                                         fontWeight: FontWeight.w700,
-                                        color: kBg,
+                                        color: cs.onPrimary,
                                         letterSpacing: 2.5,
                                       ),
                                     ),
                                     SizedBox(width: r.sm),
                                     Icon(
                                       Icons.arrow_forward_rounded,
-                                      color: kBg,
+                                      color: cs.onPrimary,
                                       size: r.sp(18),
                                     ),
                                   ],
@@ -235,7 +243,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   Center(
                     child: Text(
                       'Your data stays on your device',
-                      style: TextStyle(fontSize: r.sp(12), color: kTextMuted),
+                      style: TextStyle(fontSize: r.sp(12), color: cs.textMuted),
                     ),
                   ),
 
@@ -249,24 +257,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _featurePill(Responsive r, IconData icon, String label) {
+  Widget _featurePill(
+    Responsive r,
+    ColorScheme cs,
+    IconData icon,
+    String label,
+  ) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: r.md, vertical: r.xs + 2),
       decoration: BoxDecoration(
-        color: kCard,
+        color: cs.card,
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: kBorder2, width: 0.5),
+        border: Border.all(color: cs.border2, width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: r.sp(13), color: kLime),
+          Icon(icon, size: r.sp(13), color: cs.lime),
           SizedBox(width: r.xs),
           Text(
             label,
             style: GoogleFonts.dmSans(
               fontSize: r.sp(12),
-              color: kTextSec,
+              color: cs.textSec,
               fontWeight: FontWeight.w500,
             ),
           ),

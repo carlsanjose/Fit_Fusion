@@ -2,13 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  await loadSavedTheme();
+  _setSystemOverlayStyle();
+  themeNotifier.addListener(_setSystemOverlayStyle);
+  runApp(const WorkoutShufflerApp());
+}
+
+void _setSystemOverlayStyle() {
+  final isDark = themeNotifier.value != ThemeMode.light;
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
+    SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarIconBrightness: isDark
+          ? Brightness.light
+          : Brightness.dark,
     ),
   );
-  runApp(const WorkoutShufflerApp());
 }

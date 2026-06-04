@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/utils/responsive.dart';
 import '../../models/active_exercise.dart';
 import '../../widgets/session_card.dart';
@@ -11,6 +11,7 @@ class SessionScreen extends StatelessWidget {
   final VoidCallback onShuffle;
   final void Function(int index) onToggleDone;
   final VoidCallback onWeightChanged;
+  final void Function(int seconds) onStartTimer;
 
   const SessionScreen({
     super.key,
@@ -18,25 +19,46 @@ class SessionScreen extends StatelessWidget {
     required this.onShuffle,
     required this.onToggleDone,
     required this.onWeightChanged,
+    required this.onStartTimer,
   });
 
   @override
   Widget build(BuildContext context) {
     final r = Responsive(context);
+    final cs = Theme.of(context).colorScheme;
     final done = session.where((e) => e.isDone).length;
     final total = session.length;
     final pct = total == 0 ? 0.0 : done / total;
 
     return Scaffold(
-      backgroundColor: kBg,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: kOrange,
-        elevation: 0,
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          onShuffle();
-        },
-        child: Icon(Icons.shuffle_rounded, color: Colors.white, size: r.sp(22)),
+      backgroundColor: cs.bg,
+      // In session_screen.dart, replace the FAB:
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'timer',
+            backgroundColor: cs.surface,
+            elevation: 0,
+            onPressed: () => onStartTimer(90),
+            child: Icon(Icons.timer_rounded, color: cs.lime, size: r.sp(20)),
+          ),
+          SizedBox(height: r.sm),
+          FloatingActionButton(
+            heroTag: 'shuffle',
+            backgroundColor: cs.orange,
+            elevation: 0,
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              onShuffle();
+            },
+            child: Icon(
+              Icons.shuffle_rounded,
+              color: Colors.white,
+              size: r.sp(22),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Column(
@@ -59,7 +81,7 @@ class SessionScreen extends StatelessWidget {
                             'ACTIVE',
                             style: GoogleFonts.rajdhani(
                               fontSize: r.sp(11),
-                              color: kOrange,
+                              color: cs.orange,
                               letterSpacing: 3,
                               fontWeight: FontWeight.w600,
                             ),
@@ -70,7 +92,7 @@ class SessionScreen extends StatelessWidget {
                             style: GoogleFonts.rajdhani(
                               fontSize: r.sp(36),
                               fontWeight: FontWeight.w700,
-                              color: kTextPri,
+                              color: cs.textPri,
                               height: 1,
                               letterSpacing: -0.5,
                             ),
@@ -87,8 +109,8 @@ class SessionScreen extends StatelessWidget {
                             style: GoogleFonts.jetBrainsMono(
                               fontSize: r.sp(36),
                               color: done == total && total > 0
-                                  ? kLime
-                                  : kTextPri,
+                                  ? cs.lime
+                                  : cs.textPri,
                               fontWeight: FontWeight.bold,
                               height: 1,
                             ),
@@ -97,7 +119,7 @@ class SessionScreen extends StatelessWidget {
                             'OF $total',
                             style: GoogleFonts.rajdhani(
                               fontSize: r.sp(11),
-                              color: kTextMuted,
+                              color: cs.textMuted,
                               letterSpacing: 1.5,
                             ),
                           ),
@@ -115,7 +137,7 @@ class SessionScreen extends StatelessWidget {
                         width: double.infinity,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: kBorder2,
+                          color: cs.border2,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -127,7 +149,9 @@ class SessionScreen extends StatelessWidget {
                             pct,
                         height: 4,
                         decoration: BoxDecoration(
-                          color: done == total && total > 0 ? kSuccess : kLime,
+                          color: done == total && total > 0
+                              ? cs.success
+                              : cs.lime,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -147,8 +171,8 @@ class SessionScreen extends StatelessWidget {
                         style: GoogleFonts.rajdhani(
                           fontSize: r.sp(11),
                           color: done == total && total > 0
-                              ? kSuccess
-                              : kTextMuted,
+                              ? cs.success
+                              : cs.textMuted,
                           letterSpacing: 1.5,
                         ),
                       ),
@@ -156,7 +180,7 @@ class SessionScreen extends StatelessWidget {
                         '${total - done} REMAINING',
                         style: GoogleFonts.rajdhani(
                           fontSize: r.sp(11),
-                          color: kTextMuted,
+                          color: cs.textMuted,
                           letterSpacing: 1,
                         ),
                       ),
@@ -164,7 +188,7 @@ class SessionScreen extends StatelessWidget {
                   ),
 
                   SizedBox(height: r.md),
-                  Container(height: 0.5, color: kBorder),
+                  Container(height: 0.5, color: cs.border),
                 ],
               ),
             ),
@@ -174,7 +198,7 @@ class SessionScreen extends StatelessWidget {
             // List
             Expanded(
               child: session.isEmpty
-                  ? _buildEmptyState(r)
+                  ? _buildEmptyState(r, context)
                   : ListView.builder(
                       padding: EdgeInsets.symmetric(horizontal: r.md),
                       itemCount: session.length,
@@ -192,7 +216,8 @@ class SessionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(Responsive r) {
+  Widget _buildEmptyState(Responsive r, BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: EdgeInsets.all(r.xl),
@@ -204,13 +229,13 @@ class SessionScreen extends StatelessWidget {
               height: r.sp(72),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: kCard,
-                border: Border.all(color: kBorder2, width: 0.5),
+                color: cs.card,
+                border: Border.all(color: cs.border2, width: 0.5),
               ),
               child: Icon(
                 Icons.shuffle_rounded,
                 size: r.sp(30),
-                color: kTextMuted,
+                color: cs.textMuted,
               ),
             ),
             SizedBox(height: r.lg),
@@ -218,7 +243,7 @@ class SessionScreen extends StatelessWidget {
               'NO SESSION LOADED',
               style: GoogleFonts.rajdhani(
                 fontSize: r.sp(16),
-                color: kTextMuted,
+                color: cs.textMuted,
                 letterSpacing: 2,
               ),
             ),
@@ -228,7 +253,7 @@ class SessionScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: r.sp(13),
-                color: kTextMuted,
+                color: cs.textMuted,
                 height: 1.6,
               ),
             ),
